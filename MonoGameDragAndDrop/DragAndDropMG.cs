@@ -34,6 +34,7 @@ namespace MonoGameDragAndDrop {
 
             this.Window.Title = "MonoGame Drag & Drop Examples";
 
+            // the odd screen size is just to make the math easy for placing the items
             graphics.PreferredBackBufferWidth = 1000;
             graphics.PreferredBackBufferHeight = 750;
 
@@ -49,7 +50,9 @@ namespace MonoGameDragAndDrop {
         /// </summary>
         protected override void Initialize() {
 
+            // viewport allows for dynamic screen scaling
             viewport = new ScalingViewportAdapter(GraphicsDevice, 1000, 750);
+
 
             inputManager = new InputListenerManager();
             var mouseListener = inputManager.AddListener(new MouseListenerSettings());
