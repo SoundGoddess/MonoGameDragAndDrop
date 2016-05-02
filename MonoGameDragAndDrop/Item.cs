@@ -20,7 +20,6 @@ namespace MonoGameDragAndDrop {
         InFront
     }
 
-
     class Item : Game {
 
         public Vector2 Position { get; set; }
@@ -28,15 +27,17 @@ namespace MonoGameDragAndDrop {
         public Item Child { get; }
         public bool IsDraggable { get; set; } = true;
         public ZOrder ZIndex { get; set; } = ZOrder.Normal;
+        public int stackValue;
 
         private InputListenerManager inputManager;
 
         private Vector2 origin;
 
-        public Item(Texture2D texture, Vector2 position) {
+        public Item(Texture2D texture, Vector2 position, int value) {
             Texture = texture;
             Position = position;
             origin = position;
+            stackValue = value;
         }
 
 
@@ -51,6 +52,8 @@ namespace MonoGameDragAndDrop {
 
                 Console.WriteLine("move this:" + mouseState.X, mouseState.Y);
 
+  
+
             }
 
         }
@@ -60,6 +63,17 @@ namespace MonoGameDragAndDrop {
 
             // if it's supposed to stick to wherever it lands then update origin
             // otherwise do an animation to return it to origin
+
+            /*
+        
+            Item parent = ???;
+
+            if (stackValue == parent.stackValue - 1) {
+
+                parent.AddChild(this);
+
+            }
+            */
 
 
         }

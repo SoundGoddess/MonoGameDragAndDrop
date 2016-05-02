@@ -80,15 +80,15 @@ namespace MonoGameDragAndDrop {
             slot = Content.Load<Texture2D>("slot");
 
             // make this slot droppable
-            Item slotItem = new Item(slot, new Vector2(425, 325));
+            Item slotItem = new Item(slot, new Vector2(425, 325), 0);
             slotItem.IsDraggable = false;
             items.Add(slotItem);
 
-            items.Add(new Item(Content.Load<Texture2D>("2"), new Vector2(25, 50)));
-            items.Add(new Item(Content.Load<Texture2D>("3"), new Vector2(225, 50)));
-            items.Add(new Item(Content.Load<Texture2D>("4"), new Vector2(425, 50)));
-            items.Add(new Item(Content.Load<Texture2D>("5"), new Vector2(625, 50)));
-            items.Add(new Item(Content.Load<Texture2D>("6"), new Vector2(825, 50)));
+            items.Add(new Item(Content.Load<Texture2D>("2"), new Vector2(25, 50), 2));
+            items.Add(new Item(Content.Load<Texture2D>("3"), new Vector2(225, 50), 3));
+            items.Add(new Item(Content.Load<Texture2D>("4"), new Vector2(425, 50), 4));
+            items.Add(new Item(Content.Load<Texture2D>("5"), new Vector2(625, 50), 5));
+            items.Add(new Item(Content.Load<Texture2D>("6"), new Vector2(825, 50), 6));
 
         }
 
@@ -133,6 +133,7 @@ namespace MonoGameDragAndDrop {
             spriteBatch.Draw(slot, new Rectangle(625, 50, slot.Width, slot.Height), Color.Black);
             spriteBatch.Draw(slot, new Rectangle(825, 50, slot.Width, slot.Height), Color.Black);
 
+            // need some code to take into account z-index
             foreach (Item item in items) {
 
                 spriteBatch.Draw(item.Texture, item.Border, Color.White);
