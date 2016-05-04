@@ -19,7 +19,14 @@ namespace MonoGameDragAndDrop {
         public T ItemUnderTheMouseCursor { get; private set; }
         public bool IsThereAnItemUnderTheMouseCursor { get; private set; }
 
-        public IEnumerable<T> Items { get { foreach (var item in _items) { yield return item; } } }
+        public IEnumerable<T> Items {
+            get {
+
+                List<T> myItems = _items.OrderBy(z => z.ZIndex).ToList();
+                foreach (var item in myItems) { yield return item; }
+
+            }
+        }
         public IEnumerable<T> SelectedItems { get { foreach (var item in _selectedItems) { yield return item; } } }
 
         public int Count { get { return _items.Count; } }
@@ -144,6 +151,9 @@ namespace MonoGameDragAndDrop {
             _selectedItems.Clear();
             _items.Clear();
         }
+
+        
+
 
     }
 }

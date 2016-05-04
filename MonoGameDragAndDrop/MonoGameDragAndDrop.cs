@@ -10,6 +10,7 @@ using MonoGame.Extended.InputListeners;
 using MonoGame.Extended.BitmapFonts;
 using MonoGame.Extended.ViewportAdapters;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MonoGameDragAndDrop {
     /// <summary>
@@ -67,6 +68,8 @@ namespace MonoGameDragAndDrop {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             dragonDrop = new DragAndDropHandler<Card>(this, spriteBatch);
+
+
 
 
             background = Content.Load<Texture2D>("grass");
@@ -129,6 +132,7 @@ namespace MonoGameDragAndDrop {
 
             // need some code to take into account z-index
             foreach (Card item in dragonDrop.Items) {
+                
                 
                 item.Draw(gameTime);
 
