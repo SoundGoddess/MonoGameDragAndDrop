@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MonoGameDragAndDrop;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -20,67 +21,58 @@ namespace MonoGameDragAndDrop {
         InFront
     }
 
-    class Item : Game {
+    class Card : IDragAndDropItem {
 
         public Vector2 Position { get; set; }
         public Texture2D Texture { get; set; }
-        public Item Child { get; }
+        public Card Child { get; }
         public bool IsDraggable { get; set; } = true;
         public ZOrder ZIndex { get; set; } = ZOrder.Normal;
         public int stackValue;
+
+
+        private readonly SpriteBatch spriteBatch;
+
+        public bool IsSelected { get; set; }
+        public bool IsMouseOver { get; set; }
+        public bool Contains(Vector2 pointToCheck) {
+            Point mouse = new Point((int)pointToCheck.X, (int)pointToCheck.Y);
+            return Border.Contains(mouse);
+        }
 
         private InputListenerManager inputManager;
 
         private Vector2 origin;
 
-        public Item(Texture2D texture, Vector2 position, int value) {
+        public Card(SpriteBatch sb, Texture2D texture, Vector2 position, int value) {
+            spriteBatch = sb;
             Texture = texture;
             Position = position;
             origin = position;
             stackValue = value;
         }
 
+        public void Draw(GameTime gameTime) {
+            Color colorToUse = Color.White;
 
-        public void OnDrag() {
 
-            if (IsDraggable) {
-
-                ZIndex = ZOrder.InFront;
-
-                var mouseState = Mouse.GetState();
-                Position = new Vector2(mouseState.X, mouseState.Y);
-
-                Console.WriteLine("move this:" + mouseState.X, mouseState.Y);
-
-  
-
+            // uncomment below to add mouseover hover coloring
+            /* 
+            if (IsSelected) {
+                colorToUse = Color.Orange;
             }
-
-        }
-
-
-        public void OnDrop() {
-
-            // if it's supposed to stick to wherever it lands then update origin
-            // otherwise do an animation to return it to origin
-
-            /*
-        
-            Item parent = ???;
-
-            if (stackValue == parent.stackValue - 1) {
-
-                parent.AddChild(this);
-
+            else {
+                if (IsMouseOver) { colorToUse = Color.Cyan; }
             }
             */
 
-
+            spriteBatch.Draw(Texture, Position, colorToUse);
         }
 
 
+        
 
-        public void AddChild(Item child) {
+        public void AddChild(Card child) {
 
 
 
@@ -106,32 +98,7 @@ namespace MonoGameDragAndDrop {
             }
 
         }
-
-        protected override void Initialize() {
-
-            inputManager = new InputListenerManager();
-            var mouseListener = inputManager.AddListener(new MouseListenerSettings());
-
-            mouseListener.MouseDrag += (sender, args) => OnDrag();
-
-
-            base.Initialize();
-        }
-
-        protected override void Update(GameTime gameTime) {
-
-
-            inputManager.Update(gameTime);
-            base.Update(gameTime);
-
-        }
-
-        protected override void Draw(GameTime gameTime) {
-
-
-            base.Draw(gameTime);
-
-        }
+        
     }
 
 }

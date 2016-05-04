@@ -10,7 +10,7 @@ namespace MonoGameDragAndDrop {
         /// </summary>
         [STAThread]
         static void Main() {
-            using (var game = new DragAndDropMG())
+            using (var game = new MonoGameDragAndDrop())
                 game.Run();
         }
     }

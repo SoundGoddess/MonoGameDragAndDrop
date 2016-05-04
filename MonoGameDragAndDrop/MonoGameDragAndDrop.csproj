@@ -38,8 +38,10 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="DragAndDropMG.cs" />
-    <Compile Include="Item.cs" />
+    <Compile Include="DragAndDropHandler.cs" />
+    <Compile Include="IDragAndDropItem.cs" />
+    <Compile Include="MonoGameDragAndDrop.cs" />
+    <Compile Include="Card.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

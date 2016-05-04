@@ -15,19 +15,18 @@ namespace MonoGameDragAndDrop {
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-    public class DragAndDropMG : Game {
+    public class MonoGameDragAndDrop : Game {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-
-        InputListenerManager inputManager;
+        
         ScalingViewportAdapter viewport;
+        DragAndDropHandler<Card> dragonDrop;
 
 
         Texture2D background, slot;
-        List<Item> items = new List<Item>();
 
 
-        public DragAndDropMG() {
+        public MonoGameDragAndDrop() {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -53,21 +52,10 @@ namespace MonoGameDragAndDrop {
             // viewport allows for dynamic screen scaling
             viewport = new ScalingViewportAdapter(GraphicsDevice, 1000, 750);
 
-
-            inputManager = new InputListenerManager();
-            var mouseListener = inputManager.AddListener(new MouseListenerSettings());
             
-            mouseListener.MouseDrag += (sender, args) => LogMessage("Mouse dragged");
             
 
             base.Initialize();
-        }
-
-
-        private void LogMessage(string messageFormat, params object[] args) {
-            var message = string.Format(messageFormat, args);
-
-            //Console.WriteLine(message);
         }
 
         /// <summary>
@@ -78,22 +66,26 @@ namespace MonoGameDragAndDrop {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            dragonDrop = new DragAndDropHandler<Card>(this, spriteBatch);
+
 
             background = Content.Load<Texture2D>("grass");
             slot = Content.Load<Texture2D>("slot");
 
             // make this slot droppable
-            Item slotItem = new Item(slot, new Vector2(425, 325), 0);
+            Card slotItem = new Card(spriteBatch, slot, new Vector2(425, 325), 0);
             slotItem.IsDraggable = false;
-            items.Add(slotItem);
+            dragonDrop.Add(slotItem);
 
-            items.Add(new Item(Content.Load<Texture2D>("2"), new Vector2(25, 50), 2));
-            items.Add(new Item(Content.Load<Texture2D>("3"), new Vector2(225, 50), 3));
-            items.Add(new Item(Content.Load<Texture2D>("4"), new Vector2(425, 50), 4));
-            items.Add(new Item(Content.Load<Texture2D>("5"), new Vector2(625, 50), 5));
-            items.Add(new Item(Content.Load<Texture2D>("6"), new Vector2(825, 50), 6));
+            dragonDrop.Add(new Card(spriteBatch, Content.Load<Texture2D>("2"), new Vector2(25, 50), 2));
+            dragonDrop.Add(new Card(spriteBatch, Content.Load<Texture2D>("3"), new Vector2(225, 50), 3));
+            dragonDrop.Add(new Card(spriteBatch, Content.Load<Texture2D>("4"), new Vector2(425, 50), 4));
+            dragonDrop.Add(new Card(spriteBatch, Content.Load<Texture2D>("5"), new Vector2(625, 50), 5));
+            dragonDrop.Add(new Card(spriteBatch, Content.Load<Texture2D>("6"), new Vector2(825, 50), 6));
 
+            Components.Add(dragonDrop);
         }
+        
 
         /// <summary>
         /// UnloadContent will be called once per game and is the place to unload
@@ -113,8 +105,7 @@ namespace MonoGameDragAndDrop {
                 Exit();
 
             // TODO: Add your update logic here
-
-            inputManager.Update(gameTime);
+            
             base.Update(gameTime);
         }
 
@@ -137,15 +128,16 @@ namespace MonoGameDragAndDrop {
             spriteBatch.Draw(slot, new Rectangle(825, 50, slot.Width, slot.Height), Color.Black);
 
             // need some code to take into account z-index
-            foreach (Item item in items) {
-
-                spriteBatch.Draw(item.Texture, item.Border, Color.White);
+            foreach (Card item in dragonDrop.Items) {
+                
+                item.Draw(gameTime);
 
             }
 
             spriteBatch.End();
 
             base.Draw(gameTime);
+                        
         }
     }
 }
