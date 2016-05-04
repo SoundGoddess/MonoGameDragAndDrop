@@ -16,7 +16,7 @@ namespace MonoGameDragAndDrop {
         SpriteBatch spriteBatch;
         ScalingViewportAdapter viewport;
 
-        private readonly List<T> _items;
+        private List<T> _items;
         private readonly List<T> _selectedItems;
 
         public T ItemUnderTheMouseCursor { get; private set; }
@@ -25,8 +25,10 @@ namespace MonoGameDragAndDrop {
         public IEnumerable<T> Items {
             get {
 
-                List<T> myItems = _items.OrderBy(z => z.ZIndex).ToList();
-                foreach (var item in myItems) { yield return item; }
+                // since MonoGame renders sprites on top of each other based on the order they are called in the Draw() method, this
+                // little line of code sorts the sprite objects to take into consideration the ZIndex so that things render as expected.
+                _items = _items.OrderBy(z => z.ZIndex).ToList();
+                foreach (var item in _items) { yield return item; }
 
             }
         }
@@ -38,6 +40,11 @@ namespace MonoGameDragAndDrop {
         private bool MouseWasJustPressed {
             get {
                 return currentMouse.LeftButton == ButtonState.Pressed && oldMouse.LeftButton == ButtonState.Released;
+            }
+        }
+        private bool MouseWasJustUnpressed {
+            get {
+                return currentMouse.LeftButton == ButtonState.Released && oldMouse.LeftButton == ButtonState.Pressed;
             }
         }
 
@@ -100,8 +107,15 @@ namespace MonoGameDragAndDrop {
 
             ItemUnderTheMouseCursor = ItemUnderMouseCursor();
 
+
             if (!Equals(ItemUnderTheMouseCursor, default(T))) {
+                
                 UpdateItemUnderMouse();
+
+                if (MouseWasJustUnpressed) {
+                    T subItem = SubItemUnderMouseCursor(ItemUnderTheMouseCursor);
+                    if (!Equals(subItem, default(T))) ItemUnderTheMouseCursor.HandleCollusion(subItem);
+                }
             }
             else {
                 if (MouseWasJustPressed) {
@@ -109,10 +123,22 @@ namespace MonoGameDragAndDrop {
                 }
             }
 
+
+
             if (currentMouse.LeftButton != ButtonState.Released) MoveSelectedItemsIfMouseButtonIsPressed();
             else DeselectAll();
         }
 
+        public T SubItemUnderMouseCursor(T currentItem) {
+
+            _items = _items.OrderBy(z => z.ZIndex).ToList();
+
+            foreach (var item in _items) {
+
+                if (item.Contains(CurrentMousePosition)) return item;
+            }
+            return default(T);
+        }
 
         public void DeselectAll() {
             for (int i = _selectedItems.Count - 1; i >= 0; i--) {

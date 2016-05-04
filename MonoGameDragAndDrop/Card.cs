@@ -18,7 +18,7 @@ namespace MonoGameDragAndDrop {
 
         public Vector2 Position { get; set; }
         public Texture2D Texture { get; set; }
-        public Card Child { get; }
+        public Card Parent { get; set; }
         public bool IsDraggable { get; set; } = true;
         public ZOrder ZIndex { get; set; } = ZOrder.Normal;
         public int stackValue;
@@ -46,17 +46,33 @@ namespace MonoGameDragAndDrop {
         public void OnDeselected() {
 
             IsSelected = false;
-            returnToOrigin = true;
+
+            if (Position != origin) returnToOrigin = true;
 
         }
 
+        public void HandleCollusion(IDragAndDropItem item) {
+
+            Card subCard = (Card)item;
+
+            subCard.AttachToParent(this);
+            item = subCard;
+
+            Console.WriteLine("todo: attach card " + stackValue + " to parent " + subCard.stackValue);
+
+        }
+
+        /// <summary>
+        /// Animation for returning the card to its original position if it can't find a new place to snap to
+        /// </summary>
+        /// <returns>returns true if the card is back in its original position; otherwise it increments the animation</returns>
         private bool ReturnToOrigin() {
 
             bool backAtOrigin = false;
 
             var pos = Position;
             float speed = 25.0f;
-
+            
             float distance = (float)Math.Sqrt(Math.Pow(origin.X - pos.X, 2) + (float)Math.Pow(origin.Y - pos.Y, 2));
             float directionX = (origin.X - pos.X) / distance;
             float directionY = (origin.Y - pos.Y) / distance;
@@ -123,9 +139,17 @@ namespace MonoGameDragAndDrop {
 
         
 
-        public void AddChild(Card child) {
+        public void AttachToParent(Card parent) {
+            
+            Parent = parent;
+            var pos = Position;
 
+            /*
+            pos.Y = parent.Position.Y + 20;
 
+            Position = pos;
+            origin = pos;
+            */
 
         }
 
@@ -139,11 +163,11 @@ namespace MonoGameDragAndDrop {
             }
         }
 
-        public bool HasChild {
+        public bool HasParent {
 
             get {
 
-                if (Child != null) return true;
+                if (Parent != null) return true;
                 else return false;
 
             }
