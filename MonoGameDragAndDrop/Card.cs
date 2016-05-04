@@ -14,13 +14,6 @@ using MonoGame.Extended.ViewportAdapters;
 
 namespace MonoGameDragAndDrop {
 
-    public enum ZOrder {
-        Background,
-        Normal,
-        Child,
-        InFront
-    }
-
     class Card : IDragAndDropItem {
 
         public Vector2 Position { get; set; }
@@ -30,6 +23,8 @@ namespace MonoGameDragAndDrop {
         public ZOrder ZIndex { get; set; } = ZOrder.Normal;
         public int stackValue;
 
+        private Vector2 origin;
+        private bool returnToOrigin = false;
 
         private readonly SpriteBatch spriteBatch;
 
@@ -40,9 +35,54 @@ namespace MonoGameDragAndDrop {
             return Border.Contains(mouse);
         }
 
+
+        public void OnSelected() {
+
+            IsSelected = true;
+            ZIndex = ZOrder.InFront;
+
+        }
+
+        public void OnDeselected() {
+
+            IsSelected = false;
+            returnToOrigin = true;
+
+        }
+
+        private bool ReturnToOrigin() {
+
+            bool backAtOrigin = false;
+
+            var pos = Position;
+            float speed = 25.0f;
+
+            float distance = (float)Math.Sqrt(Math.Pow(origin.X - pos.X, 2) + (float)Math.Pow(origin.Y - pos.Y, 2));
+            float directionX = (origin.X - pos.X) / distance;
+            float directionY = (origin.Y - pos.Y) / distance;
+
+            pos.X += directionX * speed;
+            pos.Y += directionY * speed;
+
+            
+            if (Math.Sqrt(Math.Pow(pos.X - Position.X, 2) + Math.Pow(pos.Y - Position.Y, 2)) >= distance) { 
+
+                Position = origin;
+
+                backAtOrigin = true;
+
+                ZIndex = ZOrder.Normal;
+                
+            }
+            else Position = pos;
+
+            return backAtOrigin;
+
+        }
+
+
         private InputListenerManager inputManager;
 
-        private Vector2 origin;
 
         public Card(SpriteBatch sb, Texture2D texture, Vector2 position, int value) {
             spriteBatch = sb;
@@ -50,6 +90,17 @@ namespace MonoGameDragAndDrop {
             Position = position;
             origin = position;
             stackValue = value;
+        }
+
+        public void Update(GameTime gameTime) {
+
+            if (returnToOrigin) {
+
+                returnToOrigin = !ReturnToOrigin();
+
+            }
+
+
         }
 
         public void Draw(GameTime gameTime) {

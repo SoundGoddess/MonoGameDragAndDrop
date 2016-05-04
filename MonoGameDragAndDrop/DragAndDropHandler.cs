@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MonoGame.Extended.ViewportAdapters;
 
 namespace MonoGameDragAndDrop {
 
@@ -13,6 +14,8 @@ namespace MonoGameDragAndDrop {
 
         MouseState oldMouse, currentMouse;
         SpriteBatch spriteBatch;
+        ScalingViewportAdapter viewport;
+
         private readonly List<T> _items;
         private readonly List<T> _selectedItems;
 
@@ -39,11 +42,24 @@ namespace MonoGameDragAndDrop {
         }
 
         private Vector2 CurrentMousePosition {
-            get { return new Vector2(currentMouse.X, currentMouse.Y); }
+            get {
+
+                Point point = viewport.PointToScreen(currentMouse.X, currentMouse.Y);
+
+                return new Vector2(point.X, point.Y);
+                    
+            }
         }
 
         public Vector2 OldMousePosition {
-            get { return new Vector2(oldMouse.X, oldMouse.Y); }
+            get {
+
+                Point point = viewport.PointToScreen(oldMouse.X, oldMouse.Y);
+
+                return new Vector2(point.X, point.Y);
+                
+
+            }
         }
 
         public Vector2 MouseMovementSinceLastUpdate {
@@ -64,8 +80,9 @@ namespace MonoGameDragAndDrop {
         }
 
 
-        public DragAndDropHandler(Game game, SpriteBatch sb) : base(game) {
+        public DragAndDropHandler(Game game, SpriteBatch sb, ScalingViewportAdapter vp) : base(game) {
             spriteBatch = sb;
+            viewport = vp;
             _selectedItems = new List<T>();
             _items = new List<T>();
         }
@@ -128,16 +145,14 @@ namespace MonoGameDragAndDrop {
 
 
         private void SelectItem(T itemToSelect) {
-            itemToSelect.IsSelected = true;
-            itemToSelect.ZIndex = ZOrder.InFront;
+            itemToSelect.OnSelected();
             if (!_selectedItems.Contains(itemToSelect)) {
                 _selectedItems.Add(itemToSelect);
             }
         }
 
         private void DeselectItem(T itemToDeselect) {
-            itemToDeselect.IsSelected = false;
-            itemToDeselect.ZIndex = ZOrder.Normal;
+            itemToDeselect.OnDeselected();
             _selectedItems.Remove(itemToDeselect);
         }
 
