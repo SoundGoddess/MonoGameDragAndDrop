@@ -8,6 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 using MonoGame.Extended.ViewportAdapters;
 
+// note: adapted from XNA example by Jakob Krarup (xnafan.net)
+
+
 namespace MonoGameDragAndDrop {
 
     class DragAndDropHandler<T> : DrawableGameComponent where T : IDragAndDropItem {
