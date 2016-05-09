@@ -1,7 +1,11 @@
 # MonoGameDragAndDrop
-Reference code for implementing some basic drag &amp; drop functionality in MonoGame.
+Reference code for implementing some basic drag &amp; drop functionality in MonoGame
 
-Uses MonoGame.Extended to add scaling viewport support.
+**Watch the video below:**
+
+[![IMAGE ALT TEXT](http://img.youtube.com/vi/F0W-nfH_LUI/0.jpg)](http://www.youtube.com/watch?v=F0W-nfH_LUI "Example Video")
+
+Uses MonoGame.Extended to add scaling viewport support (resize the screen to any size you want).
 
 ####**Current version: [1.0 (Windows)](https://github.com/SoundGoddess/MonoGameDragAndDrop/releases)**
 
