@@ -1,5 +1,8 @@
 ﻿// ©2016 HathorsLove.com
 // Licensed under The MIT License (MIT)
+//
+// If you like this, check out my project OpenSolitare:
+// https://github.com/SoundGoddess/OpenSolitaire
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
