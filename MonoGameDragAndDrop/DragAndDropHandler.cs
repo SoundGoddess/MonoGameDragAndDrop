@@ -109,7 +109,7 @@ namespace MonoGameDragAndDrop {
 
 
             if (!Equals(ItemUnderTheMouseCursor, default(T))) {
-                
+                                
                 UpdateItemUnderMouse();
 
                 if (MouseWasJustUnpressed) {

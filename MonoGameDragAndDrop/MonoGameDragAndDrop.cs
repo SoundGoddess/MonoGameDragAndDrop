@@ -24,7 +24,8 @@ namespace MonoGameDragAndDrop {
         DragAndDropHandler<Card> dragonDrop;
 
 
-        Texture2D background, slot;
+        Texture2D background, slot, reset;
+        Rectangle resetRect;
 
 
         public MonoGameDragAndDrop() {
@@ -69,11 +70,10 @@ namespace MonoGameDragAndDrop {
 
             dragonDrop = new DragAndDropHandler<Card>(this, spriteBatch, viewport);
 
-
-
-
             background = Content.Load<Texture2D>("grass");
             slot = Content.Load<Texture2D>("slot");
+            reset = Content.Load<Texture2D>("reset");
+            resetRect = new Rectangle(350, 600, reset.Width, reset.Height);
 
             // make this slot droppable
             Card slotItem = new Card(spriteBatch, slot, new Vector2(425, 325), 0);
@@ -108,7 +108,20 @@ namespace MonoGameDragAndDrop {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            MouseState ms = Mouse.GetState();
 
+            Point point = viewport.PointToScreen(ms.X, ms.Y);
+
+            if (ms.LeftButton == ButtonState.Pressed) {
+
+                if (resetRect.Contains(point)) {
+
+                    foreach (var item in dragonDrop.Items) item.Reset(); 
+
+                }
+
+            }
+     
 
             foreach (Card item in dragonDrop.Items) item.Update(gameTime);
             
@@ -127,12 +140,15 @@ namespace MonoGameDragAndDrop {
             var destinationRectangle = new Rectangle(0, 0, 1000, 750);
 
             spriteBatch.Begin(transformMatrix: viewport.GetScaleMatrix());
+            
             spriteBatch.Draw(background, destinationRectangle, Color.White);
+            spriteBatch.Draw(reset, resetRect, Color.White);
             spriteBatch.Draw(slot, new Rectangle(25, 50, slot.Width, slot.Height), Color.Black);
             spriteBatch.Draw(slot, new Rectangle(225, 50, slot.Width, slot.Height), Color.Black);
             spriteBatch.Draw(slot, new Rectangle(425, 50, slot.Width, slot.Height), Color.Black);
             spriteBatch.Draw(slot, new Rectangle(625, 50, slot.Width, slot.Height), Color.Black);
             spriteBatch.Draw(slot, new Rectangle(825, 50, slot.Width, slot.Height), Color.Black);
+
             
             foreach (Card item in dragonDrop.Items) {
                 

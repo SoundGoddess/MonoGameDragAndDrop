@@ -49,9 +49,11 @@ namespace MonoGameDragAndDrop {
         public int stackValue;
         private int _zIndex;
 
-        private Vector2 origin;
+        private Vector2 origin, resetMe;
         private bool returnToOrigin = false;
-        private bool hasChild = false;
+        public bool hasChild = false;
+        public bool isDiscarded = false;
+        
 
         private readonly SpriteBatch spriteBatch;
         
@@ -62,22 +64,35 @@ namespace MonoGameDragAndDrop {
             return Border.Contains(mouse);
         }
 
-        public void OnPositionUpdate() {
+        public void Reset() {
 
+            if (isDiscarded) {
+                IsDraggable = true;
+                _zIndex = -stackValue;
+            }
+            origin = resetMe;
+            hasChild = false;
+            isDiscarded = false;
+            if (Position != origin) returnToOrigin = true;
+        }
+
+        public void OnPositionUpdate() {
+            
             if (hasChild) {
 
                 Card child = Child;
                 
-                var pos = Position;
+                if (!child.isDiscarded) { 
+                    var pos = Position;
 
-                pos.Y = Position.Y + 28;
-                pos.X = Position.X;
+                    pos.Y = Position.Y + 28;
+                    pos.X = Position.X;
 
-                child.origin = pos;
-                child.Position = pos;
+                    child.origin = pos;
+                    child.Position = pos;
 
-                Child = child;
-
+                    Child = child;
+               }
             }
 
         }
@@ -105,16 +120,28 @@ namespace MonoGameDragAndDrop {
 
             if (item.Border.Intersects(Border)) { 
                 Card parent = (Card)item;
+                
+                if (!isDiscarded) { 
+                    if (parent.stackValue == (stackValue + 1)) { 
+                        parent.AttachChild(this);
+                        item = parent;
+                    }
+                    else if (!parent.IsDraggable && !hasChild && (parent.stackValue == 0)) {
+                        
+                        ZIndex = parent.ZIndex + 1;
+                        Position = parent.Position;
+                        origin = Position;
+                        isDiscarded = true;
+                        IsDraggable = false;
 
-                if (parent.stackValue == (stackValue + 1)) { 
-                    parent.AttachChild(this);
-                    item = parent;
+                    }
                 }
             }
 
 
 
         }
+        
 
         public void AttachChild(Card child) {
             
@@ -174,9 +201,13 @@ namespace MonoGameDragAndDrop {
             origin = position;
             stackValue = value;
             ZIndex = -stackValue;
+            resetMe = origin;
         }
 
         public void Update(GameTime gameTime) {
+
+            // feels kinda hacky but this fixes a really annoying bug
+            if (hasChild && Child.isDiscarded) hasChild = false;
 
             if (returnToOrigin) {
 
