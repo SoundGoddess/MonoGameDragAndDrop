@@ -78,7 +78,7 @@ namespace MonoGameDragAndDrop {
             // make this slot droppable
             Card slotItem = new Card(spriteBatch, slot, new Vector2(425, 325), 0);
             slotItem.IsDraggable = false;
-            slotItem.ZIndex = ZOrder.Background;
+            slotItem.ZIndex = -2000;
             dragonDrop.Add(slotItem);
 
             dragonDrop.Add(new Card(spriteBatch, Content.Load<Texture2D>("2"), new Vector2(25, 50), 2));

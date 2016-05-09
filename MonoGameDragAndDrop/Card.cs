@@ -16,18 +16,45 @@ namespace MonoGameDragAndDrop {
 
     class Card : IDragAndDropItem {
 
-        public Vector2 Position { get; set; }
+        private Vector2 _position;
+
+        public Vector2 Position {
+
+            get { return _position; }
+
+            set { _position = value; OnPositionUpdate(); }
+
+        }
+                        
         public Texture2D Texture { get; set; }
-        public Card Parent { get; set; }
+        public Card Child { get; set; }
         public bool IsDraggable { get; set; } = true;
-        public ZOrder ZIndex { get; set; } = ZOrder.Normal;
+
+        private const int ON_TOP = 1000;
+
+        // many examples use an enum for ZIndex, which is great for many 
+        // applications but an int seems easier for playing card stacks
+        // public ZOrder ZIndex { get; set; } = ZOrder.Normal;
+
+
+
+        public int ZIndex {
+            get { return _zIndex; }
+            set {
+                _zIndex = value;
+                if (hasChild) Child.ZIndex = _zIndex + 1;
+            }
+        }
+
         public int stackValue;
+        private int _zIndex;
 
         private Vector2 origin;
         private bool returnToOrigin = false;
+        private bool hasChild = false;
 
         private readonly SpriteBatch spriteBatch;
-
+        
         public bool IsSelected { get; set; }
         public bool IsMouseOver { get; set; }
         public bool Contains(Vector2 pointToCheck) {
@@ -35,15 +62,38 @@ namespace MonoGameDragAndDrop {
             return Border.Contains(mouse);
         }
 
+        public void OnPositionUpdate() {
+
+            if (hasChild) {
+
+                Card child = Child;
+                
+                var pos = Position;
+
+                pos.Y = Position.Y + 28;
+                pos.X = Position.X;
+
+                child.origin = pos;
+                child.Position = pos;
+
+                Child = child;
+
+            }
+
+        }
 
         public void OnSelected() {
 
-            IsSelected = true;
-            ZIndex = ZOrder.InFront;
+            if (IsDraggable) {
+                IsSelected = true;
+                ZIndex += ON_TOP;
+            }
 
         }
 
         public void OnDeselected() {
+            
+            // don't reset ZIndex here; let returnToOrigin handle it
 
             IsSelected = false;
 
@@ -53,15 +103,35 @@ namespace MonoGameDragAndDrop {
 
         public void HandleCollusion(IDragAndDropItem item) {
 
-            Card subCard = (Card)item;
+            if (item.Border.Intersects(Border)) { 
+                Card parent = (Card)item;
 
-            subCard.AttachToParent(this);
-            item = subCard;
+                if (parent.stackValue == (stackValue + 1)) { 
+                    parent.AttachChild(this);
+                    item = parent;
+                }
+            }
 
-            Console.WriteLine("todo: attach card " + stackValue + " to parent " + subCard.stackValue);
+
 
         }
 
+        public void AttachChild(Card child) {
+            
+            var pos = Position;
+
+            pos.Y = Position.Y + 28;
+            pos.X = Position.X;
+
+            child.origin = pos;
+            child.Position = pos;
+
+            Child = child;
+            hasChild = true;
+
+            ZIndex = -stackValue;
+
+        }
         /// <summary>
         /// Animation for returning the card to its original position if it can't find a new place to snap to
         /// </summary>
@@ -87,7 +157,7 @@ namespace MonoGameDragAndDrop {
 
                 backAtOrigin = true;
 
-                ZIndex = ZOrder.Normal;
+                ZIndex = -stackValue;
                 
             }
             else Position = pos;
@@ -96,16 +166,14 @@ namespace MonoGameDragAndDrop {
 
         }
 
-
-        private InputListenerManager inputManager;
-
-
+        
         public Card(SpriteBatch sb, Texture2D texture, Vector2 position, int value) {
             spriteBatch = sb;
             Texture = texture;
             Position = position;
             origin = position;
             stackValue = value;
+            ZIndex = -stackValue;
         }
 
         public void Update(GameTime gameTime) {
@@ -139,19 +207,6 @@ namespace MonoGameDragAndDrop {
 
         
 
-        public void AttachToParent(Card parent) {
-            
-            Parent = parent;
-            var pos = Position;
-
-            /*
-            pos.Y = parent.Position.Y + 20;
-
-            Position = pos;
-            origin = pos;
-            */
-
-        }
 
 
 
@@ -163,16 +218,6 @@ namespace MonoGameDragAndDrop {
             }
         }
 
-        public bool HasParent {
-
-            get {
-
-                if (Parent != null) return true;
-                else return false;
-
-            }
-
-        }
         
     }
 

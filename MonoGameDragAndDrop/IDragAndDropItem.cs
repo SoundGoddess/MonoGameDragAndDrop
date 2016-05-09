@@ -18,7 +18,8 @@ namespace MonoGameDragAndDrop {
         bool Contains(Vector2 pointToCheck);
         Rectangle Border { get; }
         bool IsDraggable { get; set; }
-        ZOrder ZIndex { get; set; }
+        //ZOrder ZIndex { get; set; }
+        int ZIndex { get; set; }
         Texture2D Texture { get; set; }
 
         void OnSelected();

@@ -113,8 +113,20 @@ namespace MonoGameDragAndDrop {
                 UpdateItemUnderMouse();
 
                 if (MouseWasJustUnpressed) {
-                    T subItem = SubItemUnderMouseCursor(ItemUnderTheMouseCursor);
-                    if (!Equals(subItem, default(T))) ItemUnderTheMouseCursor.HandleCollusion(subItem);
+
+                    _items = _items.OrderBy(z => z.ZIndex).ToList();
+
+                    foreach (T item in _items) {
+
+                        if (!Equals(ItemUnderTheMouseCursor, item)) {
+
+                            ItemUnderTheMouseCursor.HandleCollusion(item);
+
+                        }
+
+                    }
+
+
                 }
             }
             else {
